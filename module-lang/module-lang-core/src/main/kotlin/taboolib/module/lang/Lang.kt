@@ -23,28 +23,21 @@ fun ProxyCommandSender.asLangText(node: String, vararg args: Any): String {
 
 fun ProxyCommandSender.asLangTextOrNull(node: String, vararg args: Any): String? {
     val file = getLocaleFile()
-    if (file != null) {
-        return (file.nodes[node] as? TypeText)?.asText(this, *args)
-    }
-    return null
+    return if (file != null) (file.nodes[node] as? TypeText)?.asText(this, *args) else null
 }
 
 fun ProxyCommandSender.asLangTextList(node: String, vararg args: Any): List<String> {
-    val file = getLocaleFile()
-    return if (file == null) {
-        listOf("{$node}")
-    } else {
-        when (val type = file.nodes[node]) {
-            is TypeText -> {
-                val text = type.asText(this, *args)
-                if (text != null) listOf(text) else emptyList()
-            }
-            is TypeList -> {
-                type.asTextList(this, *args)
-            }
-            else -> {
-                listOf("{$node}")
-            }
+    val file = getLocaleFile() ?: return listOf("{$node}")
+    return when (val type = file.nodes[node]) {
+        is TypeText -> {
+            val text = type.asText(this, *args)
+            if (text != null) listOf(text) else emptyList()
+        }
+        is TypeList -> {
+            type.asTextList(this, *args)
+        }
+        else -> {
+            listOf("{$node}")
         }
     }
 }
@@ -55,11 +48,6 @@ fun ProxyCommandSender.getLocale(): String {
 
 fun ProxyCommandSender.getLocaleFile(): LanguageFile? {
     val locale = getLocale()
-    return Language.languageFile.entries.firstOrNull { it.key.equals(locale, true) }?.value
-        ?: Language.languageFile[Language.default]
-        ?: Language.languageFile.values.firstOrNull()
-}
-
-fun registerLanguage(vararg code: String) {
-    Language.addLanguage(*code)
+    val file = Language.getLanguageFile()
+    return file.entries.firstOrNull { it.key.equals(locale, true) }?.value ?: file[Language.defaultLanguageCode] ?: file.values.firstOrNull()
 }

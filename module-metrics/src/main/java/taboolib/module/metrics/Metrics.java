@@ -7,7 +7,8 @@ import taboolib.common.platform.Platform;
 import taboolib.common.platform.function.AdapterKt;
 import taboolib.common.platform.function.ExecutorKt;
 import taboolib.common.platform.function.IOKt;
-import taboolib.module.configuration.SecuredFile;
+import taboolib.module.configuration.Configuration;
+import taboolib.module.configuration.Type;
 
 import java.io.File;
 import java.util.Map;
@@ -24,13 +25,13 @@ public class Metrics {
      *                  href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
      */
     public Metrics(int serviceId, String pluginVersion, Platform runningPlatform) {
-        if (TabooLib.getRunningPlatform() != runningPlatform) {
+        if (TabooLib.runningPlatform() != runningPlatform) {
             return;
         }
         // Get the config file
         File bStatsFolder = new File(IOKt.getDataFolder().getParentFile(), "bStats");
         File configFile = FileKt.newFile(bStatsFolder, "config.yml", true, false);
-        SecuredFile config = SecuredFile.Companion.loadConfiguration(configFile);
+        Configuration config = Configuration.Companion.loadFromFile(configFile, Type.YAML);
         if (!config.contains("serverUUID")) {
             config.set("enabled", true);
             config.set("serverUUID", UUID.randomUUID().toString());
@@ -72,7 +73,7 @@ public class Metrics {
                 enabled,
                 json -> appendPlatformData(json, runningPlatform),
                 json -> appendServiceData(json, pluginVersion),
-                task -> ExecutorKt.submit(false, false, 0, 0, "", r -> {
+                task -> ExecutorKt.submit(false, 0, 0, "", r -> {
                     task.run();
                     return Unit.INSTANCE;
                 }),

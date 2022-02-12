@@ -15,8 +15,8 @@ import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.function.registerBukkitListener
 import taboolib.common.platform.function.submit
-import org.tabooproject.reflex.Reflex.Companion.getProperty
-import org.tabooproject.reflex.Reflex.Companion.invokeMethod
+import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion.major
 import taboolib.module.nms.i18n.I18n
 import taboolib.module.nms.type.LightType

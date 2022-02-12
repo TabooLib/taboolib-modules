@@ -8,10 +8,10 @@ dependencies {
     compileOnly("com.electronwill.night-config:toml:3.6.5")
     compileOnly("com.electronwill.night-config:json:3.6.5")
     compileOnly("com.electronwill.night-config:hocon:3.6.5")
-    compileOnly("org.tabooproject.taboolib:common-util:${project.property("version-common")}")
+    compileOnly("org.tabooproject.taboolib:common-util:${project.properties["version-common"]}")
     // Optional
-    compileOnly("org.tabooproject.taboolib:common-adapter:${project.property("version-common")}")
-    compileOnly("org.tabooproject.taboolib:common-environment:${project.property("version-common")}")
+    compileOnly("org.tabooproject.taboolib:common-adapter:${project.properties["version-common"]}")
+    compileOnly("org.tabooproject.taboolib:common-environment:${project.properties["version-common"]}")
     compileOnly(project(":module-chat"))
 }
 

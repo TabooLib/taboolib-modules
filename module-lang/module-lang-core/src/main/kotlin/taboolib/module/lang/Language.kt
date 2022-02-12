@@ -6,13 +6,14 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.getJarFile
+import taboolib.internal.LanguageReader
 import taboolib.module.chat.ColorTranslator
-import taboolib.module.chat.HexColor
 import taboolib.module.chat.colored
 import taboolib.module.lang.event.PlayerSelectLocaleEvent
 import taboolib.module.lang.event.SystemSelectLocaleEvent
 import java.util.*
 import java.util.jar.JarFile
+import kotlin.collections.HashMap
 
 /**
  * TabooLib
@@ -25,16 +26,11 @@ import java.util.jar.JarFile
 object Language {
 
     private var firstLoaded = false
-
-    var default = "zh_CN"
-
-    val textTransfer = ArrayList<TextTransfer>()
-
-    val languageFile = HashMap<String, LanguageFile>()
-
-    val languageCode = HashSet<String>()
-
-    val languageCodeTransfer = hashMapOf(
+    private val registeredTextTransfer = ArrayList<TextTransfer>()
+    private val registeredLanguageFile = HashMap<String, LanguageFile>()
+    private val registeredLanguageCode = HashSet<String>()
+    private val registeredLanguageType = HashMap<String, Class<out Type>>()
+    private val languageCodeAliases = hashMapOf(
         "zh_hans_cn" to "zh_CN",
         "zh_hant_cn" to "zh_TW",
         "en_ca" to "en_US",
@@ -42,61 +38,84 @@ object Language {
         "en_gb" to "en_US",
         "en_nz" to "en_US"
     )
-
-    val languageType = hashMapOf(
-        "text" to TypeText::class.java,
-        "json" to TypeJson::class.java,
-        "title" to TypeTitle::class.java,
-        "sound" to TypeSound::class.java,
-        "command" to TypeCommand::class.java,
-        "actionbar" to TypeActionBar::class.java
-    )
+    var defaultLanguageCode = "zh_CN"
 
     init {
-        JarFile(getJarFile()).use { jar ->
-            jar.entries().iterator().forEachRemaining {
-                if (it.name.startsWith("lang/") && it.name.endsWith(".yml")) {
-                    languageCode += it.name.substringAfter('/').substringBeforeLast('.')
-                }
-            }
-        }
-        try {
-            ColorTranslator.translate("")
-            textTransfer += object : TextTransfer {
-                override fun translate(sender: ProxyCommandSender, source: String): String {
-                    return source.colored()
-                }
-            }
-        } catch (_: NoClassDefFoundError) {
-        }
-    }
-
-    fun addLanguage(vararg code: String) {
-        languageCode += code
-        if (firstLoaded) {
-            reload()
-        }
-    }
-
-    fun getLocale(player: ProxyPlayer): String {
-        return PlayerSelectLocaleEvent(player, languageCodeTransfer[player.locale.lowercase()] ?: player.locale).run {
-            call()
-            locale
-        }
-    }
-
-    fun getLocale(): String {
-        val code = Locale.getDefault().toLanguageTag().replace("-", "_").lowercase()
-        return SystemSelectLocaleEvent(languageCodeTransfer[code] ?: code).run {
-            call()
-            locale
-        }
+        langDefaultLanguageCode()
+        addColorLanguageTransfer()
+        addLanguageType("text", TypeText::class.java)
     }
 
     @Awake(LifeCycle.INIT)
     fun reload() {
         firstLoaded = true
-        languageFile.clear()
-        languageFile.putAll(ResourceReader(Language::class.java).files)
+        registeredLanguageFile.clear()
+        registeredLanguageFile.putAll(LanguageReader(Language::class.java).files)
+    }
+
+    fun addLanguageCode(vararg code: String) {
+        registeredLanguageCode += code
+        if (firstLoaded) {
+            reload()
+        }
+    }
+
+    fun addLanguageType(type: String, clazz: Class<out Type>) {
+        registeredLanguageType[type] = clazz
+    }
+
+    fun addLanguageAlias(code: String, alias: String) {
+        languageCodeAliases[code] = alias
+    }
+
+    fun addLanguageTransfer(transfer: TextTransfer) {
+        registeredTextTransfer += transfer
+    }
+
+    fun getLanguageFile(): Map<String, LanguageFile> {
+        return registeredLanguageFile
+    }
+
+    fun getLanguageCode(): Set<String> {
+        return registeredLanguageCode
+    }
+
+    fun getLanguageType(): Map<String, Class<out Type>> {
+        return registeredLanguageType
+    }
+
+    fun getLanguageTransfer(): List<TextTransfer> {
+        return registeredTextTransfer
+    }
+
+    fun getLocale(player: ProxyPlayer): String {
+        return PlayerSelectLocaleEvent(player, languageCodeAliases[player.locale.lowercase()] ?: player.locale).apply { call() }.locale
+    }
+
+    fun getLocale(): String {
+        val code = Locale.getDefault().toLanguageTag().replace("-", "_").lowercase()
+        return SystemSelectLocaleEvent(languageCodeAliases[code] ?: code).apply { call() }.locale
+    }
+
+    private fun langDefaultLanguageCode() {
+        JarFile(getJarFile()).use { jar ->
+            jar.entries().iterator().forEach {
+                if (it.name.startsWith("lang/") && it.name.endsWith(".yml")) {
+                    addLanguageCode(it.name.substringAfter('/').substringBeforeLast('.'))
+                }
+            }
+        }
+    }
+
+    private fun addColorLanguageTransfer() {
+        try {
+            ColorTranslator.translate("")
+            addLanguageTransfer(object : TextTransfer {
+                override fun translate(sender: ProxyCommandSender, source: String): String {
+                    return source.colored()
+                }
+            })
+        } catch (_: NoClassDefFoundError) {
+        }
     }
 }

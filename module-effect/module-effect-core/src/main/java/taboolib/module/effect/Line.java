@@ -86,7 +86,7 @@ public class Line extends ParticleObj implements Playable {
 
     @Override
     public void play() {
-        ExecutorKt.submit(false, false, 0, getPeriod(), null, task -> {
+        ExecutorKt.submit(false, 0, getPeriod(), null, task -> {
             // 进行关闭
             if (currentStep > length) {
                 task.cancel();

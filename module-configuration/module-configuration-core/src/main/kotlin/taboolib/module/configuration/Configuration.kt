@@ -1,8 +1,8 @@
 package taboolib.module.configuration
 
 import com.electronwill.nightconfig.core.conversion.ObjectConverter
-import org.tabooproject.reflex.Reflex.Companion.invokeConstructor
-import org.tabooproject.reflex.Reflex.Companion.unsafeInstance
+import taboolib.common.reflect.Reflex.Companion.invokeConstructor
+import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.common.env.RuntimeDependencies
 import taboolib.common.env.RuntimeDependency
 import taboolib.internal.ConfigFile

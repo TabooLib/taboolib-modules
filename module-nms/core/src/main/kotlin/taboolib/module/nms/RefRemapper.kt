@@ -3,8 +3,8 @@ package taboolib.module.nms
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.signature.SignatureReader
 import org.objectweb.asm.signature.SignatureVisitor
-import org.tabooproject.reflex.Reflection
-import org.tabooproject.reflex.ReflexRemapper
+import taboolib.common.reflect.Reflection
+import taboolib.common.reflect.ReflexRemapper
 import java.util.concurrent.ConcurrentHashMap
 
 /**

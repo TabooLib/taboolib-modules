@@ -22,7 +22,7 @@ subprojects {
 
     dependencies {
         "compileOnly"(kotlin("stdlib"))
-        "compileOnly"("org.tabooproject.taboolib:common-core:${project.property("version-common")}")
+        "compileOnly"("org.tabooproject.taboolib:common-core:${project.properties["version-common"]}")
     }
 
     configure<JavaPluginExtension> {
@@ -36,7 +36,6 @@ subprojects {
 
     tasks.withType<ShadowJar> {
         archiveClassifier.set("")
-        relocate("org.tabooproject.reflex", "taboolib.common.reflect")
     }
 
     tasks.withType<JavaCompile> {

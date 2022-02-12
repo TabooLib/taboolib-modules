@@ -9,7 +9,7 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import org.tabooproject.reflex.Reflex.Companion.invokeMethod
+import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.library.xseries.XMaterial
 import java.util.concurrent.ConcurrentHashMap
 

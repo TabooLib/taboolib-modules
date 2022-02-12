@@ -1,11 +1,14 @@
-package taboolib.module.lang
+package taboolib.internal
 
 import taboolib.common.platform.function.releaseResourceFile
-import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.warning
+import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.util.Yaml
+import taboolib.module.configuration.util.getMapAs
+import taboolib.module.lang.*
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
@@ -18,20 +21,21 @@ import java.util.regex.Pattern
  * @author sky
  * @since 2021/6/21 11:48 下午
  */
-class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
+@Internal
+class LanguageReader(val clazz: Class<*>, val migrate: Boolean = true) {
 
     val files = HashMap<String, LanguageFile>()
     val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm")
 
     init {
-        Language.languageCode.forEach { code ->
+        Language.getLanguageCode().forEach { code ->
             val resourceAsStream = clazz.classLoader.getResourceAsStream("lang/$code.yml")
             if (resourceAsStream != null) {
                 val nodes = HashMap<String, Type>()
                 val source = resourceAsStream.readBytes().toString(StandardCharsets.UTF_8)
-                val sourceFile = SecuredFile.loadConfiguration(source)
+                val conf = Configuration.loadFromString(source, taboolib.module.configuration.Type.YAML)
                 // 加载内存中的原件
-                loadNodes(sourceFile, nodes, code)
+                loadNodes(conf, nodes, code)
                 // 释放文件
                 val file = releaseResourceFile("lang/$code.yml")
                 // 移除文件监听
@@ -40,12 +44,12 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
                 }
                 val exists = HashMap<String, Type>()
                 // 加载文件
-                loadNodes(SecuredFile.loadConfiguration(file), exists, code)
+                loadNodes(Configuration.loadFromFile(file), exists, code)
                 // 检查缺失
                 val missingKeys = nodes.keys.filter { !exists.containsKey(it) }
                 if (missingKeys.isNotEmpty() && migrate) {
                     // 更新文件
-                    migrateFile(missingKeys, sourceFile, file)
+                    migrateFile(missingKeys, conf, file)
                 }
                 nodes += exists
                 files[code] = LanguageFile(file, nodes).also {
@@ -54,8 +58,8 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
                     if (isFileWatcherHook) {
                         FileWatcher.INSTANCE.addSimpleListener(file) {
                             it.nodes.clear()
-                            loadNodes(sourceFile, it.nodes, code)
-                            loadNodes(SecuredFile.loadConfiguration(file), it.nodes, code)
+                            loadNodes(conf, it.nodes, code)
+                            loadNodes(Configuration.loadFromFile(file), it.nodes, code)
                         }
                     }
                 }
@@ -64,10 +68,10 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
     }
 
     @Suppress("SimplifiableCallChain")
-    fun loadNodes(file: SecuredFile, nodesMap: HashMap<String, Type>, code: String) {
+    fun loadNodes(file: Configuration, nodesMap: HashMap<String, Type>, code: String) {
         migrateLegacyVersion(file)
         file.getKeys(false).forEach { node ->
-            when (val obj = file.get(node)) {
+            when (val obj = file[node]) {
                 is String -> {
                     nodesMap[node] = TypeText(obj)
                 }
@@ -96,7 +100,7 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
     private fun loadNode(map: Map<String, Any>, code: String, node: String?): Type? {
         return if (map.containsKey("type") || map.containsKey("==")) {
             val type = (map["type"] ?: map["=="]).toString().lowercase()
-            val typeInstance = Language.languageType[type]?.getDeclaredConstructor()?.newInstance()
+            val typeInstance = Language.getLanguageType()[type]?.invokeConstructor()
             if (typeInstance != null) {
                 typeInstance.init(map)
             } else {
@@ -109,24 +113,22 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
         }
     }
 
-    private fun migrateFile(missing: List<String>, source: SecuredFile, file: File) {
-        submit(async = true) {
-            val append = ArrayList<String>()
-            append += "# ------------------------- #"
-            append += "#  UPDATE ${dateFormat.format(System.currentTimeMillis())}  #"
-            append += "# ------------------------- #"
-            append += ""
-            missing.forEach { key ->
-                val obj = source[key]
-                if (obj != null) {
-                    append += SecuredFile.dumpAll(key, obj)
-                }
+    private fun migrateFile(missing: List<String>, source: Configuration, file: File) {
+        val append = ArrayList<String>()
+        append += "# ------------------------- #"
+        append += "#  UPDATE ${dateFormat.format(System.currentTimeMillis())}  #"
+        append += "# ------------------------- #"
+        append += ""
+        missing.forEach { key ->
+            val obj = source[key]
+            if (obj != null) {
+                append += Yaml.dumpAll(key, obj)
             }
-            file.appendText("\n${append.joinToString("\n")}")
         }
+        file.appendText("\n${append.joinToString("\n")}")
     }
 
-    private fun migrateLegacyVersion(file: SecuredFile) {
+    private fun migrateLegacyVersion(file: Configuration) {
         if (file.file == null) {
             return
         }
@@ -135,20 +137,20 @@ class ResourceReader(val clazz: Class<*>, val migrate: Boolean = true) {
         values.forEach {
             if (it.key.contains('.')) {
                 fixed = true
-                file.set(it.key.substringBefore('.'), null)
-                file.set(it.key.replace('.', '-'), when (val obj = it.value) {
+                file[it.key.substringBefore('.')] = null
+                file[it.key.replace('.', '-')] = when (val obj = it.value) {
                     is ConfigurationSection -> migrateLegacyJsonType(obj)
                     is List<*> -> {
                         obj.map { element ->
                             when (element) {
-                                is Map<*, *> -> migrateLegacyJsonType(element.mapKeys { entry -> entry.key.toString() }.toSection(SecuredFile()))
+                                is Map<*, *> -> migrateLegacyJsonType(element.mapKeys { entry -> entry.key.toString() }.toSection(Configuration.empty()))
                                 is String -> element.ifEmpty { "&r" }
                                 else -> element
                             }
                         }
                     }
                     else -> obj
-                })
+                }
             }
         }
         if (fixed) {

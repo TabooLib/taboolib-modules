@@ -4,7 +4,7 @@ import com.electronwill.nightconfig.core.Config
 import com.electronwill.nightconfig.core.file.FileNotFoundAction
 import com.electronwill.nightconfig.core.io.ConfigParser
 import com.electronwill.nightconfig.core.io.ParsingMode
-import org.tabooproject.reflex.Reflex.Companion.setProperty
+import taboolib.common.reflect.Reflex.Companion.setProperty
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import java.io.File
@@ -37,7 +37,7 @@ open class ConfigFile(root: Config) : ConfigSection(root), Configuration {
     }
 
     override fun saveToFile(file: File?) {
-        (file ?: this.file)?.writeText(saveToString()) ?: error("No file")
+        (file ?: this.file)?.writeText(saveToString()) ?: error("file not found")
     }
 
     override fun set(path: String, value: Any?) {
@@ -52,7 +52,7 @@ open class ConfigFile(root: Config) : ConfigSection(root), Configuration {
             if (file.extension != "bak") {
                 file.copyTo(File(file.parent, file.name + "_" + SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()) + ".bak"))
             }
-            println("File: $file")
+            println("error file: $file")
             throw ex
         }
         hook.forEach { it.run() }
@@ -62,7 +62,7 @@ open class ConfigFile(root: Config) : ConfigSection(root), Configuration {
         try {
             parser().parse(contents, root, ParsingMode.REPLACE)
         } catch (t: Exception) {
-            println("Source: \n$contents")
+            println("error source: \n$contents")
             throw t
         }
         hook.forEach { it.run() }

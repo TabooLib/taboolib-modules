@@ -95,8 +95,7 @@ public class Arc extends ParticleObj implements Playable {
     @Override
     public void play() {
         currentAngle = startAngle;
-
-        ExecutorKt.submit(false, false, 0, getPeriod(), null, task -> {
+        ExecutorKt.submit(false, 0, getPeriod(), null, task -> {
             // 进行关闭
             if (currentAngle > angle) {
                 task.cancel();
@@ -106,7 +105,6 @@ public class Arc extends ParticleObj implements Playable {
             double radians = Math.toRadians(currentAngle);
             double x = radius * Math.cos(radians);
             double z = radius * Math.sin(radians);
-
             spawnParticle(getOrigin().clone().add(x, 0, z));
             return Unit.INSTANCE;
         });

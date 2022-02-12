@@ -26,7 +26,7 @@ class AngelWing {
         renderer.add(" aaaa")
         renderer.add(" aaa ")
         renderer.add(" a   ")
-        renderer.set('a') { ProxyParticle.FLAME.sendTo(it) }
+        renderer['a'] = { ProxyParticle.FLAME.sendTo(it) }
     }
 
     /**

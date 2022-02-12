@@ -38,7 +38,7 @@ open class WingRender(var height: Int, var width: Int) {
     /**
      * 添加一行形状 每个char都对应一种特效
      */
-    operator fun add(str: String) {
+    fun add(str: String) {
         add(str, size)
         size++
     }
@@ -98,7 +98,7 @@ open class WingRender(var height: Int, var width: Int) {
         }
     }
 
-    protection fun getSpace(count: Int): String {
+    protected fun getSpace(count: Int): String {
         val builder = StringBuilder()
         for (i in 0..count) {
             builder.append(" ")

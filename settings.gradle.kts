@@ -3,7 +3,6 @@ rootProject.name = "TabooLib"
 include("module-chat")
 include("module-configuration:module-configuration-annotation")
 include("module-configuration:module-configuration-core")
-include("module-configuration:module-configuration-core-shaded")
 include("module-configuration:module-configuration-data")
 include("module-effect:module-effect-core")
 include("module-effect:module-effect-wing")

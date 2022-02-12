@@ -1,9 +1,9 @@
 package taboolib.module.nms;
 
 import org.bukkit.attribute.Attribute;
-import org.tabooproject.reflex.ClassField;
-import org.tabooproject.reflex.ClassMethod;
-import org.tabooproject.reflex.ReflexClass;
+import taboolib.common.reflect.ClassField;
+import taboolib.common.reflect.ClassMethod;
+import taboolib.common.reflect.ReflexClass;
 import taboolib.common.Isolated;
 
 import java.util.Arrays;
