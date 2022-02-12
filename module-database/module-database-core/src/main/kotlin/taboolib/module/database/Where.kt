@@ -7,9 +7,9 @@ class Where : WhereExecutor() {
     val query: String
         get() = data.joinToString(" AND ") { it.query }
 
-    val elements: List<Any>
+    val elements: List<Any?>
         get() {
-            val el = ArrayList<Any>()
+            val el = ArrayList<Any?>()
             fun WhereData.push() {
                 if (children.isNotEmpty()) {
                     children.forEach { it.push() }

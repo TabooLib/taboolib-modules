@@ -1,15 +1,19 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 dependencies {
-    compileOnly("com.zaxxer:HikariCP:4.0.3")
-    compileOnly(project(":common:common-core"))
-    compileOnly(project(":module-configuration"))
+    compileOnly("com.zaxxer:HikariCP:5.0.1")
+    compileOnly("org.tabooproject.taboolib:common-core:${project.properties["version-common"]}")
+    compileOnly("org.tabooproject.taboolib:common-environment:${project.properties["version-common"]}")
+    compileOnly(project(":module-configuration:module-configuration-annotation"))
+    compileOnly(project(":module-configuration:module-configuration-core"))
+}
+
+shrinking {
+    shadow = true
 }
 
 tasks {
-    withType<Jar> {
-        destinationDirectory.set(file("build/libs"))
-    }
-    withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-        archiveClassifier.set("")
-        relocate("com.zaxxer.hikari", "com.zaxxer.hikari_4_0_3")
+    withType<ShadowJar> {
+        relocate("com.zaxxer.hikari", "hikari501")
     }
 }

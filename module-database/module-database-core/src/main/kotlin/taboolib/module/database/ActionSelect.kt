@@ -48,9 +48,9 @@ class ActionSelect(val table: String) : WhereExecutor(), Action {
             return query
         }
 
-    override val elements: List<Any>
+    override val elements: List<Any?>
         get() {
-            val el = ArrayList<Any>()
+            val el = ArrayList<Any?>()
             el.addAll(join.flatMap { it.elements })
             el.addAll(where?.elements ?: emptyList())
             return el

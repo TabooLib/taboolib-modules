@@ -16,6 +16,6 @@ class Join(val type: JoinType, val from: String, val where: Where) {
             "$type JOIN `$from` ON ${where.query}"
         }
 
-    val elements: List<Any>
+    val elements: List<Any?>
         get() = where.elements
 }

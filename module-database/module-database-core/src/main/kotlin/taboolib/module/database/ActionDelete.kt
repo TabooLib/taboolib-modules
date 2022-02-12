@@ -18,7 +18,7 @@ class ActionDelete(val table: String) : WhereExecutor(), Action {
     override val query: String
         get() = "DELETE FROM ${table.formatColumn()} WHERE ${where?.query ?: ""}".trim()
 
-    override val elements: List<Any>
+    override val elements: List<Any?>
         get() = where?.elements ?: emptyList()
 
     fun where(whereData: WhereData) {

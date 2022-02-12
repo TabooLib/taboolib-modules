@@ -28,9 +28,9 @@ class ActionUpdate(val table: String) : WhereExecutor(), Action {
             return query
         }
 
-    override val elements: List<Any>
+    override val elements: List<Any?>
         get() {
-            val el = ArrayList<Any>()
+            val el = ArrayList<Any?>()
             el.addAll(set.mapNotNull { it.value })
             el.addAll(where?.elements ?: emptyList())
             return el

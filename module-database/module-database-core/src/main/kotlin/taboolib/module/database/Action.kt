@@ -14,7 +14,7 @@ interface Action {
 
     val query: String
 
-    val elements: List<Any>
+    val elements: List<Any?>
 
     fun onFinally(onFinally: PreparedStatement.(Connection) -> Unit)
 

@@ -1,6 +1,5 @@
 package taboolib.module.database
 
-import taboolib.common.platform.function.warning
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
@@ -53,8 +52,8 @@ open class Query(val table: Table<*, *>, var dataSource: DataSource) {
                     try {
                         prepareStatement.executeQuery().use { func(this) }.also { action?.runFinally(prepareStatement, this@use) }
                     } catch (ex: SQLException) {
-                        warning(query)
-                        warning("Statement parameter (${action?.elements?.size ?: 0}): ${action?.elements}")
+                        System.err.println(query)
+                        System.err.println("Statement parameter (${action?.elements?.size ?: 0}): ${action?.elements}")
                         throw ex
                     }
                 }
@@ -73,8 +72,8 @@ open class Query(val table: Table<*, *>, var dataSource: DataSource) {
                     try {
                         (prepareStatement.executeUpdate() as C).also { action?.runFinally(prepareStatement, this@use) }
                     } catch (ex: SQLException) {
-                        warning(query)
-                        warning("Statement parameter (${action?.elements?.size ?: 0}): ${action?.elements}")
+                        System.err.println(query)
+                        System.err.println("Statement parameter (${action?.elements?.size ?: 0}): ${action?.elements}")
                         throw ex
                     }
                 }
