@@ -26,7 +26,7 @@ class ActionSwitch(val sender: ParsedAction<*>) : ScriptAction<Void>() {
 
         @KetherParser(["switch"])
         fun parser() = scriptParser {
-            ActionSwitch(it.next(ArgTypes.ACTION))
+            ActionSwitch(it.nextParsedAction())
         }
     }
 }

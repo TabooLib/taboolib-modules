@@ -26,7 +26,7 @@ class ActionPlaceholder(val source: ParsedAction<*>) : ScriptAction<String>() {
 
         @KetherParser(["papi", "placeholder"])
         fun parser() = scriptParser {
-            ActionPlaceholder(it.next(ArgTypes.ACTION))
+            ActionPlaceholder(it.nextParsedAction())
         }
     }
 }

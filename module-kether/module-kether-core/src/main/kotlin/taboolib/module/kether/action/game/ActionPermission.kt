@@ -20,7 +20,7 @@ class ActionPermission(val permission: ParsedAction<*>) : ScriptAction<Boolean>(
 
         @KetherParser(["perm", "permission"])
         fun parser() = scriptParser {
-            ActionPermission(it.next(ArgTypes.ACTION))
+            ActionPermission(it.nextParsedAction())
         }
     }
 }

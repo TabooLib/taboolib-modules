@@ -24,7 +24,7 @@ class ActionColor(val source: ParsedAction<*>) : ScriptAction<String>() {
 
         @KetherParser(["color", "colored"])
         fun parser() = scriptParser {
-            ActionColor(it.next(ArgTypes.ACTION))
+            ActionColor(it.nextParsedAction())
         }
     }
 }

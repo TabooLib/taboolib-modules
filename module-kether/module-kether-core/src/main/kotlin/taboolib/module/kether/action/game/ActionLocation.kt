@@ -57,17 +57,17 @@ class ActionLocation(
          */
         @KetherParser(["loc", "location"])
         fun parser() = scriptParser {
-            val world = it.next(ArgTypes.ACTION)
-            val x = it.next(ArgTypes.ACTION)
-            val y = it.next(ArgTypes.ACTION)
-            val z = it.next(ArgTypes.ACTION)
+            val world = it.nextParsedAction()
+            val x = it.nextParsedAction()
+            val y = it.nextParsedAction()
+            val z = it.nextParsedAction()
             var yaw: ParsedAction<*> = ParsedAction(LiteralAction<Any>("0"))
             var pitch: ParsedAction<*> = ParsedAction(LiteralAction<Any>("0"))
             it.mark()
             try {
                 it.expect("and")
-                yaw = it.next(ArgTypes.ACTION)
-                pitch = it.next(ArgTypes.ACTION)
+                yaw = it.nextParsedAction()
+                pitch = it.nextParsedAction()
             } catch (ignored: Exception) {
                 it.reset()
             }

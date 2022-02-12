@@ -28,11 +28,11 @@ class ActionTitle(val title: ParsedAction<*>, val subTitle: ParsedAction<*>, val
 
         @KetherParser(["title"])
         fun parser() = scriptParser {
-            val title = it.next(ArgTypes.ACTION)
+            val title = it.nextParsedAction()
             it.mark()
             val subTitle = try {
                 it.expect("subtitle")
-                it.next(ArgTypes.ACTION)
+                it.nextParsedAction()
             } catch (ignored: Exception) {
                 it.reset()
                 ParsedAction(LiteralAction<String>(""))

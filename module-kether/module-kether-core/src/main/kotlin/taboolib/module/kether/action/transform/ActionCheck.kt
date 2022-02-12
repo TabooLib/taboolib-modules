@@ -32,12 +32,10 @@ class ActionCheck(val left: ParsedAction<*>, val right: ParsedAction<*>, val sym
 
     @Suppress("UNCHECKED_CAST")
     override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-        return CompletableFuture<Boolean>().also { future ->
-            frame.newFrame(left).run<Any?>().thenAccept { left ->
-                frame.newFrame(right).run<Any?>().thenAccept { right ->
-                    future.complete(check(left, right))
-                }
-            }
+        return frame.newFrame(left).run<Any?>().thenApply { left ->
+            frame.newFrame(right).run<Any?>().thenApply { right ->
+                check(left, right)
+            }.join()
         }
     }
 
@@ -45,7 +43,7 @@ class ActionCheck(val left: ParsedAction<*>, val right: ParsedAction<*>, val sym
 
         @KetherParser(["check"])
         fun parser() = scriptParser {
-            val left = it.next(ArgTypes.ACTION)
+            val left = it.nextParsedAction()
             val symbol = when (val type = it.nextToken()) {
                 "==", "is" -> EQUALS
                 "=!", "is!" -> EQUALS_MEMORY
@@ -57,7 +55,7 @@ class ActionCheck(val left: ParsedAction<*>, val right: ParsedAction<*>, val sym
                 "<=" -> LT_EQ
                 else -> throw KetherError.NOT_SYMBOL.create(type)
             }
-            val right = it.next(ArgTypes.ACTION)
+            val right = it.nextParsedAction()
             ActionCheck(left, right, symbol)
         }
     }

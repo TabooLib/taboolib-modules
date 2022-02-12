@@ -20,6 +20,6 @@ final class NotAction extends QuestAction<Boolean> {
     }
 
     public static QuestActionParser parser(QuestService<?> service) {
-        return QuestActionParser.of(resolver -> new NotAction(resolver.next(ArgTypes.ACTION)));
+        return QuestActionParser.of(resolver -> new NotAction(resolver.nextParsedAction()));
     }
 }

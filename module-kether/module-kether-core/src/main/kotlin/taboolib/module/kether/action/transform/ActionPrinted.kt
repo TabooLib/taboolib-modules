@@ -12,9 +12,7 @@ import java.util.concurrent.CompletableFuture
 class ActionPrinted(val date: ParsedAction<*>, val separator: String) : ScriptAction<List<String>>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<List<String>> {
-        return frame.newFrame(date).run<Any>().thenApply {
-            it.toString().printed(separator)
-        }
+        return frame.newFrame(date).run<Any>().thenApply { it.toString().printed(separator) }
     }
 
     internal object Parser {
@@ -24,7 +22,7 @@ class ActionPrinted(val date: ParsedAction<*>, val separator: String) : ScriptAc
          */
         @KetherParser(["printed"])
         fun parser() = scriptParser {
-            ActionPrinted(it.next(ArgTypes.ACTION), try {
+            ActionPrinted(it.nextParsedAction(), try {
                 it.mark()
                 it.expects("by", "with")
                 it.nextToken()

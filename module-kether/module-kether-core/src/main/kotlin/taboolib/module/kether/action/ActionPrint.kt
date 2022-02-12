@@ -24,7 +24,7 @@ class ActionPrint(val message: ParsedAction<*>) : ScriptAction<Void>() {
 
         @KetherParser(["log", "print"])
         fun parser() = scriptParser {
-            ActionPrint(it.next(ArgTypes.ACTION))
+            ActionPrint(it.nextParsedAction())
         }
     }
 }

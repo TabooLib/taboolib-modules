@@ -14,9 +14,7 @@ class ActionFunction(val source: ParsedAction<*>) : ScriptAction<String>() {
     override fun run(frame: ScriptFrame): CompletableFuture<String> {
         val vars = frame.deepVars()
         return frame.newFrame(source).run<Any>().thenApply {
-            KetherFunction.parse(it.toString().trimIndent()) {
-                vars.forEach { (k, v) -> rootFrame().variables().set(k, v) }
-            }
+            KetherFunction.parse(it.toString().trimIndent()) { vars.forEach { (k, v) -> rootFrame().variables().set(k, v) } }
         }
     }
 
@@ -24,7 +22,7 @@ class ActionFunction(val source: ParsedAction<*>) : ScriptAction<String>() {
 
         @KetherParser(["inline", "function"])
         fun parser() = scriptParser {
-            ActionFunction(it.next(ArgTypes.ACTION))
+            ActionFunction(it.nextParsedAction())
         }
     }
 }

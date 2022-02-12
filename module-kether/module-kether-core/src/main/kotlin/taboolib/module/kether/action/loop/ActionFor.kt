@@ -63,10 +63,10 @@ class ActionFor(val key: String, val values: ParsedAction<*>, val action: Parsed
         fun parser() = scriptParser {
             ActionFor(it.nextToken(), it.run {
                 expect("in")
-                next(ArgTypes.ACTION)
+                nextParsedAction()
             }, it.run {
                 expect("then")
-                next(ArgTypes.ACTION)
+                nextParsedAction()
             })
         }
     }

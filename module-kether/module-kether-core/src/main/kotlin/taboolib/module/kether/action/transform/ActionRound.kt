@@ -9,16 +9,15 @@ import taboolib.module.kether.ScriptFrame
 import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /**
  * @author IzzelAliz
  */
-class ActionRound(val number: ParsedAction<*>) : ScriptAction<Int>() {
+class ActionRound(val number: ParsedAction<*>) : ScriptAction<Long>() {
 
-    override fun run(frame: ScriptFrame): CompletableFuture<Int> {
-        return frame.newFrame(number).run<Any>().thenApply {
-            Coerce.toDouble(it).roundToInt()
-        }
+    override fun run(frame: ScriptFrame): CompletableFuture<Long> {
+        return frame.newFrame(number).run<Any>().thenApply { Coerce.toDouble(it).roundToLong() }
     }
 
     internal object Parser {
@@ -28,7 +27,7 @@ class ActionRound(val number: ParsedAction<*>) : ScriptAction<Int>() {
          */
         @KetherParser(["round"])
         fun parser() = scriptParser {
-            ActionRound(it.next(ArgTypes.ACTION))
+            ActionRound(it.nextParsedAction())
         }
     }
 }

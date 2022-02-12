@@ -1,6 +1,5 @@
 package taboolib.module.kether.action
 
-import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.library.kether.QuestAction
 import taboolib.library.kether.QuestContext
@@ -44,11 +43,11 @@ class ActionSet {
             val token = it.nextToken()
             if (token.isNotEmpty() && token[token.length - 1] == ']' && token.indexOf('[') in 1 until token.length) {
                 it.reset()
-                val action = it.next(ArgTypes.ACTION).action as ActionProperty.Get
+                val action = it.nextParsedAction().action as ActionProperty.Get
                 it.mark()
                 try {
                     it.expect("to")
-                    ActionProperty.Set(action.instance, action.key, it.next(ArgTypes.ACTION))
+                    ActionProperty.Set(action.instance, action.key, it.nextParsedAction())
                 } catch (ex: Exception) {
                     it.reset()
                     ActionProperty.Set(action.instance, action.key, ParsedAction(LiteralAction<String>(it.nextToken())))
@@ -58,15 +57,15 @@ class ActionSet {
                 try {
                     it.expect("property")
                     val property = it.nextToken()
-                    val source = it.next(ArgTypes.ACTION)
+                    val source = it.nextParsedAction()
                     it.expect("to")
-                    ActionProperty.Set(source, property, it.next(ArgTypes.ACTION))
+                    ActionProperty.Set(source, property, it.nextParsedAction())
                 } catch (ex: Exception) {
                     it.reset()
                     it.mark()
                     try {
                         it.expect("to")
-                        ForAction(token, it.next(ArgTypes.ACTION))
+                        ForAction(token, it.nextParsedAction())
                     } catch (ex: Exception) {
                         it.reset()
                         ForConstant(token, it.nextToken())

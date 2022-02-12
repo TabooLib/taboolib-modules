@@ -21,7 +21,7 @@ class ActionTell(val message: ParsedAction<*>) : ScriptAction<Void>() {
 
         @KetherParser(["tell", "send", "message"])
         fun parser() = scriptParser {
-            ActionTell(it.next(ArgTypes.ACTION))
+            ActionTell(it.nextParsedAction())
         }
     }
 }

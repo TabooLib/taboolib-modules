@@ -18,17 +18,9 @@ import java.util.concurrent.CompletableFuture
 class ActionOptional(val value: ParsedAction<*>, val elseOf: ParsedAction<*>) : ScriptAction<Any>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-        val future = CompletableFuture<Any>()
-        frame.newFrame(value).run<Any>().thenApply {
-            if (it != null) {
-                future.complete(it)
-            } else {
-                frame.newFrame(elseOf).run<Any>().thenApply { elseOf ->
-                    future.complete(elseOf)
-                }
-            }
+        return frame.newFrame(value).run<Any>().thenApply {
+            it ?: frame.newFrame(elseOf).run<Any>().join()
         }
-        return future
     }
 
     internal object Parser {
@@ -38,9 +30,9 @@ class ActionOptional(val value: ParsedAction<*>, val elseOf: ParsedAction<*>) : 
          */
         @KetherParser(["optional"])
         fun parser() = scriptParser {
-            ActionOptional(it.next(ArgTypes.ACTION), it.run {
+            ActionOptional(it.nextParsedAction(), it.run {
                 it.expect("else")
-                it.next(ArgTypes.ACTION)
+                it.nextParsedAction()
             })
         }
     }

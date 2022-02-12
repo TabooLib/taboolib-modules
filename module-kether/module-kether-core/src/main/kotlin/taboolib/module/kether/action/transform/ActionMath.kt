@@ -112,12 +112,12 @@ class ActionMath(val type: Type, val array: List<ParsedAction<*>>) : ScriptActio
                 }
                 other {
                     val stack = ArrayList<MathStack>()
-                    stack += MathStack(it.next(ArgTypes.ACTION))
+                    stack += MathStack(it.nextParsedAction())
                     fun check(): Boolean {
                         return try {
                             mark()
                             val symbol = it.expects(*mathGroup)
-                            val num = it.next(ArgTypes.ACTION)
+                            val num = it.nextParsedAction()
                             stack += MathStack(num, Type.fromString(symbol))
                             check()
                             true

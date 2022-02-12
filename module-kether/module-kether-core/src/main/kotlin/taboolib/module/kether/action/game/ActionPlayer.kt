@@ -70,7 +70,7 @@ class ActionPlayer(val name: String, val operator: PlayerOperator, val method: P
             }
             if (method != PlayerOperator.Method.NONE) {
                 if (method in structure.value.usable) {
-                    ActionPlayer(structure.key, structure.value, method, it.next(ArgTypes.ACTION))
+                    ActionPlayer(structure.key, structure.value, method, it.nextParsedAction())
                 } else {
                     error("Player \"${structure.key}\" is not supported for ${method.name.lowercase(Locale.getDefault())} method.")
                 }

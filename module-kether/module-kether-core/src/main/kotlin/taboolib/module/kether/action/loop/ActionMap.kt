@@ -63,10 +63,10 @@ class ActionMap(val key: String, val values: ParsedAction<*>, val action: Parsed
         fun parser() = scriptParser {
             ActionMap(it.nextToken(), it.run {
                 expect("in")
-                next(ArgTypes.ACTION)
+                nextParsedAction()
             }, it.run {
                 expect("with")
-                next(ArgTypes.ACTION)
+                nextParsedAction()
             })
         }
     }

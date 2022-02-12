@@ -52,7 +52,7 @@ class ActionElement {
          */
         @KetherParser(["size", "length"])
         fun parser0() = scriptParser {
-            SizeOf(it.next(ArgTypes.ACTION))
+            SizeOf(it.nextParsedAction())
         }
 
         /**
@@ -60,9 +60,9 @@ class ActionElement {
          */
         @KetherParser(["elem", "element"])
         fun parser1() = scriptParser {
-            ElementOf(it.next(ArgTypes.ACTION), it.run {
+            ElementOf(it.nextParsedAction(), it.run {
                 it.expects("in", "of")
-                it.next(ArgTypes.ACTION)
+                it.nextParsedAction()
             })
         }
     }

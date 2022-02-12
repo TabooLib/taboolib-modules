@@ -13,9 +13,7 @@ import java.util.concurrent.CompletableFuture
 class ActionFormat(val date: ParsedAction<*>, val format: String) : ScriptAction<String>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<String> {
-        return frame.newFrame(date).run<Any>().thenApply {
-            DateFormatUtils.format(Coerce.toLong(it), format)
-        }
+        return frame.newFrame(date).run<Any>().thenApply { DateFormatUtils.format(Coerce.toLong(it), format) }
     }
 
     internal object Parser {
@@ -26,7 +24,7 @@ class ActionFormat(val date: ParsedAction<*>, val format: String) : ScriptAction
         @KetherParser(["format"])
         fun parser() = scriptParser {
             ActionFormat(
-                it.next(ArgTypes.ACTION), try {
+                it.nextParsedAction(), try {
                     it.mark()
                     it.expects("by", "with")
                     it.nextToken()

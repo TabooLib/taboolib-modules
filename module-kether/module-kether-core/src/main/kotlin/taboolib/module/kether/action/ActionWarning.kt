@@ -24,7 +24,7 @@ class ActionWarning(val message: ParsedAction<*>) : ScriptAction<Void>() {
 
         @KetherParser(["warn", "warning"])
         fun parser() = scriptParser {
-            ActionWarning(it.next(ArgTypes.ACTION))
+            ActionWarning(it.nextParsedAction())
         }
     }
 }

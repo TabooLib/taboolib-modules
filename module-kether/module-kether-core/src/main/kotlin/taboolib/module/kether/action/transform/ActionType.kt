@@ -65,7 +65,7 @@ class ActionType {
         fun parser() = scriptParser {
             try {
                 it.mark()
-                ActionTypeTo(TypeTo.valueOf(it.expects(*types).uppercase(Locale.getDefault())), it.next(ArgTypes.ACTION))
+                ActionTypeTo(TypeTo.valueOf(it.expects(*types).uppercase(Locale.getDefault())), it.nextParsedAction())
             } catch (ex: Throwable) {
                 it.reset()
                 ActionType(it.nextToken())

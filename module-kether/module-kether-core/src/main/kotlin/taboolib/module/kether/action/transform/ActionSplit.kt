@@ -28,7 +28,7 @@ class ActionSplit(val value: ParsedAction<*>, val split: String) : ScriptAction<
         @KetherParser(["split"])
         fun parser() = scriptParser {
             ActionSplit(
-                it.next(ArgTypes.ACTION), try {
+                it.nextParsedAction(), try {
                     it.mark()
                     it.expects("by", "with")
                     it.nextToken()

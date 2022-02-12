@@ -24,7 +24,7 @@ class ActionSubtitle(val subTitle: ParsedAction<*>, val fadeIn: Int, val stay: I
 
         @KetherParser(["subtitle"])
         fun parser() = scriptParser {
-            val subTitle = it.next(ArgTypes.ACTION)
+            val subTitle = it.nextParsedAction()
             var fadeIn = 0
             var stay = 20
             var fadeOut = 0

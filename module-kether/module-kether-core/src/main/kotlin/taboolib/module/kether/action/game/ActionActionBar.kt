@@ -22,7 +22,7 @@ class ActionActionBar(val message: ParsedAction<*>) : ScriptAction<Void>() {
 
         @KetherParser(["actionbar"])
         fun parser() = scriptParser {
-            ActionActionBar(it.next(ArgTypes.ACTION))
+            ActionActionBar(it.nextParsedAction())
         }
     }
 }

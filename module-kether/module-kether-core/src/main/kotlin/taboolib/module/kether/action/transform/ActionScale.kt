@@ -15,16 +15,14 @@ import java.util.concurrent.CompletableFuture
 class ActionScale(val number: ParsedAction<*>) : ScriptAction<Double>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Double> {
-        return frame.newFrame(number).run<Any>().thenApply {
-            Coerce.format(Coerce.toDouble(it))
-        }
+        return frame.newFrame(number).run<Any>().thenApply { Coerce.format(Coerce.toDouble(it)) }
     }
 
     internal object Parser {
 
         @KetherParser(["scale", "scaled"])
         fun parser() = scriptParser {
-            ActionScale(it.next(ArgTypes.ACTION))
+            ActionScale(it.nextParsedAction())
         }
     }
 }
