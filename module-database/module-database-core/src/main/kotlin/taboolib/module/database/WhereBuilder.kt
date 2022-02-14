@@ -2,22 +2,14 @@ package taboolib.module.database
 
 /**
  * TabooLib
- * taboolib.module.database.WhereExecutor
+ * taboolib.module.database.WhereBuilder
  *
  * @author sky
  * @since 2021/6/24 1:58 上午
  */
-abstract class WhereExecutor {
+abstract class WhereBuilder {
 
     abstract fun append(whereData: WhereData)
-
-    fun String.eqNull(): WhereData {
-        return this eq null
-    }
-
-    fun String.neqNull(): WhereData {
-        return not(this eq null)
-    }
 
     infix fun String.eq(value: Any?): WhereData {
         return if (value is PreValue) {
@@ -41,13 +33,9 @@ abstract class WhereExecutor {
 
     infix fun String.lte(value: Any): WhereData {
         return if (value is PreValue) {
-            WhereData("${formatColumn()} <= ${value.formatColumn()}").also {
-                append(it)
-            }
+            WhereData("${formatColumn()} <= ${value.formatColumn()}").apply { append(this) }
         } else {
-            WhereData("${formatColumn()} <= ?", listOf(value)).also {
-                append(it)
-            }
+            WhereData("${formatColumn()} <= ?", listOf(value)).apply { append(this) }
         }
     }
 
@@ -109,6 +97,14 @@ abstract class WhereExecutor {
             error("empty function")
         }
         return WhereData("(${where.data.joinToString(" AND ") { it.query }})", children = where.data).apply { append(this) }
+    }
+
+    fun String.eqNull(): WhereData {
+        return this eq null
+    }
+
+    fun String.neqNull(): WhereData {
+        return not(this eq null)
     }
 
     fun pre(any: Any): PreValue {

@@ -1,5 +1,6 @@
 package taboolib.module.database
 
+import taboolib.internal.EmptyTask
 import javax.sql.DataSource
 
 /**

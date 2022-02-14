@@ -12,7 +12,7 @@ import java.sql.ResultSet
 @Suppress("UNCHECKED_CAST")
 open class QueryTasks(tasks: List<QueryTask>) {
 
-    val tasks = tasks.toMutableList()
+    internal val tasks = tasks.toMutableList()
 
     init {
         if (tasks.isEmpty()) {

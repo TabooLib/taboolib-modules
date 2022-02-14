@@ -1,7 +1,9 @@
-package taboolib.module.database
+package taboolib.internal
 
+import taboolib.module.database.QueryTask
 import java.sql.ResultSet
 
+@Internal
 object EmptyTask : QueryTask(EmptyFuture) {
 
     override fun run(): Int {

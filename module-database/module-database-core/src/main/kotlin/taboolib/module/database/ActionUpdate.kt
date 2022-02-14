@@ -10,7 +10,7 @@ import java.sql.PreparedStatement
  * @author sky
  * @since 2021/6/23 5:07 下午
  */
-class ActionUpdate(val table: String) : WhereExecutor(), Action {
+class ActionUpdate(val table: String) : WhereBuilder(), Action {
 
     private var onFinally: (PreparedStatement.(Connection) -> Unit)? = null
     private val set = ArrayList<QuerySet>()

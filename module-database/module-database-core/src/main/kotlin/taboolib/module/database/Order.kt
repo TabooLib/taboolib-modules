@@ -7,7 +7,5 @@ package taboolib.module.database
 class Order(val row: String, val desc: Boolean = false) {
 
     val query: String
-        get() {
-            return "`${row.replace(".", "`.`")}` ${if (desc) "DESC" else "ASC"}"
-        }
+        get() = "`${row.replace(".", "`.`")}` ${if (desc) "DESC" else "ASC"}"
 }
