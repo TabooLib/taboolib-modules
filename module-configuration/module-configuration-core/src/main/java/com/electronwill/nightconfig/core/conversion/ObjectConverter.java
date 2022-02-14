@@ -150,7 +150,6 @@ public final class ObjectConverter {
                 if (!field.isAccessible()) {
                     field.setAccessible(true);// Enforces field access if needed
                 }
-
                 // --- Applies annotations ---
                 Object value;
                 try {
@@ -158,15 +157,13 @@ public final class ObjectConverter {
                 } catch (IllegalAccessException e) {// Unexpected: setAccessible is called if needed
                     throw new ReflectionException("Unable to parse the field " + field, e);
                 }
-                AnnotationUtils.checkField(field, value);/* Checks that the value is conform to an
-																eventual @SpecSometing annotation */
+                AnnotationUtils.checkField(field, value);/* Checks that the value is conform to an eventual @SpecSometing annotation */
                 Converter<Object, Object> converter = AnnotationUtils.getConverter(field);
                 if (converter != null) {
                     value = converter.convertFromField(value);
                 }
                 List<String> path = AnnotationUtils.getPath(field);
                 ConfigFormat<?> format = destination.configFormat();
-
                 // --- Writes the value to the configuration ---
                 if (value == null) {
                     destination.set(path, null);
@@ -189,7 +186,12 @@ public final class ObjectConverter {
                     } else if (value instanceof Collection) {
                         // Checks that the ConfigFormat supports the type of the collection's elements
                         Collection<?> src = (Collection<?>) value;
-                        Class<?> bottomType = bottomElementType(src);
+                        Class<?> bottomType = null;
+                        if (field.isAnnotationPresent(Generic.class)) {
+                            bottomType = field.getAnnotation(Generic.class).value();
+                        } else {
+                            bottomType = bottomElementType(src);
+                        }
                         if (format.supportsType(bottomType)) {
                             // Everything is supported, no conversion needed
                             destination.set(path, value);
@@ -230,7 +232,6 @@ public final class ObjectConverter {
                 if (!bypassTransient && Modifier.isTransient(fieldModifiers)) {
                     continue;// Don't process transient fields if configured so
                 }
-
                 // --- Applies annotations ---
                 List<String> path = AnnotationUtils.getPath(field);
                 Object value = config.get(path);
@@ -238,14 +239,12 @@ public final class ObjectConverter {
                 if (converter != null) {
                     value = converter.convertToField(value);
                 }
-
                 // --- Writes the value to the object's field, converting it if needed ---
                 Class<?> fieldType = field.getType();
                 try {
                     if (value instanceof UnmodifiableConfig && !(fieldType.isAssignableFrom(value.getClass()))) {
                         // --- Read as a sub-object ---
                         final UnmodifiableConfig cfg = (UnmodifiableConfig) value;
-
                         // Gets or creates the field and convert it (if null OR not preserved)
                         Object fieldValue = field.get(object);
                         if (fieldValue == null) {
@@ -255,43 +254,31 @@ public final class ObjectConverter {
                         } else if (!AnnotationUtils.mustPreserve(field, clazz)) {
                             convertToObject(cfg, fieldValue, field.getType());
                         }
-
                     } else if (value instanceof Collection && Collection.class.isAssignableFrom(fieldType)) {
                         // --- Reads as a collection, maybe a list of objects with conversion ---
                         final Collection<?> src = (Collection<?>) value;
                         final Class<?> srcBottomType = bottomElementType(src);
-
                         final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                         final List<Class<?>> dstTypes = elementTypes(genericType);
                         final Class<?> dstBottomType = dstTypes.get(dstTypes.size() - 1);
-
-                        if (srcBottomType == null
-                                || dstBottomType == null
-                                || dstBottomType.isAssignableFrom(srcBottomType)) {
-
+                        if (srcBottomType == null || dstBottomType == null || dstBottomType.isAssignableFrom(srcBottomType)) {
                             // Simple list, no conversion needed
                             AnnotationUtils.checkField(field, value);
                             field.set(object, value);
-
                         } else {
                             // List of objects => the bottom elements need conversion
-
                             // Uses the current field value if there is one, or create a new list
                             Collection<Object> dst = (Collection<Object>) field.get(object);
                             if (dst == null) {
-                                if (fieldType == ArrayList.class
-                                        || fieldType.isInterface()
-                                        || Modifier.isAbstract(fieldType.getModifiers())) {
+                                if (fieldType == ArrayList.class || fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
                                     dst = new ArrayList<>(src.size());// allocates the right size
                                 } else {
                                     dst = (Collection<Object>) createInstance(fieldType);
                                 }
                                 field.set(object, dst);
                             }
-
                             // Converts the elements of the list
                             convertConfigsToObject(src, dst, dstTypes, 0);
-
                             // Applies the checks
                             AnnotationUtils.checkField(field, dst);
                         }
@@ -352,7 +339,6 @@ public final class ObjectConverter {
             if (parameter instanceof ParameterizedType) {
                 ParameterizedType genericParameter = (ParameterizedType) parameter;
                 Class<?> paramClass = (Class<?>) genericParameter.getRawType();
-
                 storage.add(paramClass);
                 if (Collection.class.isAssignableFrom(paramClass)) {
                     detectElementTypes(genericParameter, storage);
@@ -403,10 +389,7 @@ public final class ObjectConverter {
      * @param dst             the collection of objects, destination
      * @param dstElementTypes the type of lists and objects in dst
      */
-    private void convertConfigsToObject(Collection<?> src,
-                                        Collection<Object> dst,
-                                        List<Class<?>> dstElementTypes,
-                                        int currentLevel) {
+    private void convertConfigsToObject(Collection<?> src, Collection<Object> dst, List<Class<?>> dstElementTypes, int currentLevel) {
         final Class<?> currentType = dstElementTypes.get(currentLevel);
         for (Object elem : src) {
             if (elem == null) {
@@ -414,11 +397,7 @@ public final class ObjectConverter {
             } else if (elem instanceof Collection) {
                 final Collection<?> subSrc = (Collection<?>) elem;
                 final Collection<Object> subDst;
-
-                if (currentType == ArrayList.class
-                        || currentType.isInterface()
-                        || Modifier.isAbstract(currentType.getModifiers())) {
-
+                if (currentType == ArrayList.class || currentType.isInterface() || Modifier.isAbstract(currentType.getModifiers())) {
                     subDst = new ArrayList<>();
                 } else {
                     subDst = (Collection<Object>) createInstance(currentType);
@@ -444,10 +423,7 @@ public final class ObjectConverter {
      * @param dst           the collection of configs, destination
      * @param parentConfig  the parent configuration, used to create the new configs to put in dst
      */
-    private void convertObjectsToConfigs(Collection<?> src,
-                                         Class<?> srcBottomType,
-                                         Collection<Object> dst,
-                                         Config parentConfig) {
+    private void convertObjectsToConfigs(Collection<?> src, Class<?> srcBottomType, Collection<Object> dst, Config parentConfig) {
         for (Object elem : src) {
             if (elem == null) {
                 dst.add(null);
