@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 dependencies {
-    compileOnly("com.zaxxer:HikariCP:5.0.1")
+    compileOnly("com.zaxxer:HikariCP:4.0.3")
     compileOnly("org.tabooproject.taboolib:common-core:${project.properties["version-common"]}")
     compileOnly("org.tabooproject.taboolib:common-environment:${project.properties["version-common"]}")
     compileOnly(project(":module-configuration:module-configuration-annotation"))
@@ -14,6 +14,6 @@ shrinking {
 
 tasks {
     withType<ShadowJar> {
-        relocate("com.zaxxer.hikari", "hikari501")
+        relocate("com.zaxxer.hikari", "hikari403")
     }
 }

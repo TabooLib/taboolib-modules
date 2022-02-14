@@ -11,7 +11,6 @@ dependencies {
 
 tasks {
     withType<ShadowJar> {
-        archiveClassifier.set("")
         relocate("me.lucko", "taboolib.library")
         relocate("org.objectweb", "taboolib.library")
     }

@@ -7,7 +7,6 @@ dependencies {
 
 tasks {
     withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-        archiveClassifier.set("")
         archiveBaseName.set("${archiveBaseName.get()}-shaded")
         dependencies {
             include(dependency("com.mongodb:MongoDB:3.12.2"))

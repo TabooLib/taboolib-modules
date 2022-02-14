@@ -21,7 +21,6 @@ shrinking {
 
 tasks {
     withType<ShadowJar> {
-        archiveClassifier.set("")
         dependencies {
             include(dependency("com.electronwill.night-config:core-conversion:6.0.0"))
         }

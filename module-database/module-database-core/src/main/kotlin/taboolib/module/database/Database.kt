@@ -7,7 +7,12 @@ import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import javax.sql.DataSource
 
-@RuntimeDependency(value = "!com.zaxxer:HikariCP:5.0.1", test = "!hikari501.HikariDataSource", relocate = ["!com.zaxxer.hikari", "!hikari501"])
+@RuntimeDependency(
+    value = "!com.zaxxer:HikariCP:4.0.3",
+    test = "!hikari501.HikariDataSource",
+    relocate = ["!com.zaxxer.hikari", "!hikari403"],
+
+)
 object Database {
 
     @Config("datasource.yml")

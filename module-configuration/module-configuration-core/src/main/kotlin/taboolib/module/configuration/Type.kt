@@ -12,20 +12,20 @@ import taboolib.internal.YamlFormat
  * @author mac
  * @since 2021/11/21 10:52 下午
  */
-enum class Type(private val format: () -> ConfigFormat<out Config>) {
+enum class Type(private val format: () -> ConfigFormat<out Config>?) {
 
     YAML({ YamlFormat.INSTANCE }),
 
-    TOML({ tomlFormat ?: error("toml not supported") }),
+    TOML({ tomlFormat }),
 
-    JSON({ jsonFormat ?: error("json not supported") }),
+    JSON({ jsonFormat }),
 
-    FAST_JSON({ fastJsonFormat ?: error("json not supported") }),
+    FAST_JSON({ fastJsonFormat }),
 
-    HOCON({ hoconFormat ?: error("hocon not supported") });
+    HOCON({ hoconFormat });
 
     internal fun newFormat(): ConfigFormat<out Config> {
-        return format()
+        return format() ?: error("$name not supported")
     }
 
     companion object {
