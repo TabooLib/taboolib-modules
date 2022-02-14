@@ -49,7 +49,7 @@ enum class Type(private val format: () -> ConfigFormat<out Config>?) {
         }.getOrNull()
 
         fun getType(format: ConfigFormat<*>): Type {
-            return values().first { it.newFormat().javaClass == format.javaClass }
+            return values().first { kotlin.runCatching { it.newFormat().javaClass == format.javaClass }.getOrElse { false } }
         }
     }
 }
