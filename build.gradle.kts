@@ -23,6 +23,8 @@ subprojects {
     dependencies {
         "compileOnly"(kotlin("stdlib"))
         "compileOnly"("org.tabooproject.taboolib:common-core:${project.properties["version-common"]}")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
     }
 
     configure<JavaPluginExtension> {
@@ -32,6 +34,10 @@ subprojects {
 
     configure<ShrinkingExt> {
         annotation = "taboolib.internal.Internal"
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
     tasks.withType<ShadowJar> {

@@ -51,29 +51,29 @@ interface Configuration : ConfigurationSection {
 
     companion object {
 
-        fun empty(type: Type = Type.YAML): ConfigFile {
+        fun empty(type: Type = Type.YAML): Configuration {
             return ConfigFile(type.newFormat().createConfig())
         }
 
-        fun loadFromFile(file: File, type: Type? = null): ConfigFile {
+        fun loadFromFile(file: File, type: Type? = null): Configuration {
             val configFile = ConfigFile((type ?: getTypeFromFile(file)).newFormat().createConfig())
             configFile.loadFromFile(file)
             return configFile
         }
 
-        fun loadFromReader(reader: Reader, type: Type = Type.YAML): ConfigFile {
+        fun loadFromReader(reader: Reader, type: Type = Type.YAML): Configuration {
             val configFile = ConfigFile(type.newFormat().createConfig())
             configFile.loadFromReader(reader)
             return configFile
         }
 
-        fun loadFromString(contents: String, type: Type = Type.YAML): ConfigFile {
+        fun loadFromString(contents: String, type: Type = Type.YAML): Configuration {
             val configFile = ConfigFile(type.newFormat().createConfig())
             configFile.loadFromString(contents)
             return configFile
         }
 
-        fun loadFromInputStream(inputStream: InputStream, type: Type = Type.YAML): ConfigFile {
+        fun loadFromInputStream(inputStream: InputStream, type: Type = Type.YAML): Configuration {
             val configFile = ConfigFile(type.newFormat().createConfig())
             configFile.loadFromInputStream(inputStream)
             return configFile

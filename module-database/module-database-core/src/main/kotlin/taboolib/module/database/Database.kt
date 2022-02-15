@@ -1,54 +1,22 @@
 package taboolib.module.database
 
 import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+import taboolib.common.boot.SimpleServiceLoader
 import taboolib.common.env.RuntimeDependency
-import taboolib.module.configuration.Config
-import taboolib.module.configuration.Configuration
 import javax.sql.DataSource
 
 @RuntimeDependency(value = "!com.zaxxer:HikariCP:4.0.3", test = "!hikari501.HikariDataSource", relocate = ["!com.zaxxer.hikari", "!hikari403"])
-object Database {
+abstract class Database {
 
-    @Config("datasource.yml")
-    lateinit var settingsFile: Configuration
-        private set
+    abstract fun createDataSource(host: Host, hikariConfig: HikariConfig? = null): DataSource
 
-    fun createDataSource(host: Host<*>, hikariConfig: HikariConfig? = null): DataSource {
-        return HikariDataSource(hikariConfig ?: createHikariConfig(host))
-    }
+    abstract fun createHikariConfig(host: Host): HikariConfig
 
-    fun createHikariConfig(host: Host<*>): HikariConfig {
-        val config = HikariConfig()
-        config.jdbcUrl = host.connectionUrl
-        when (host) {
-            is HostSQL -> {
-                config.driverClassName = settingsFile.getString("DefaultSettings.DriverClassName", "com.mysql.jdbc.Driver")
-                config.username = host.user
-                config.password = host.password
-            }
-            is HostSQLite -> {
-                config.driverClassName = "org.sqlite.JDBC"
-            }
-            else -> {
-                error("Unsupported host: $host")
-            }
-        }
-        config.isAutoCommit = settingsFile.getBoolean("DefaultSettings.AutoCommit", true)
-        config.minimumIdle = settingsFile.getInt("DefaultSettings.MinimumIdle", 1)
-        config.maximumPoolSize = settingsFile.getInt("DefaultSettings.MaximumPoolSize", 10)
-        config.validationTimeout = settingsFile.getLong("DefaultSettings.ValidationTimeout", 5000)
-        config.connectionTimeout = settingsFile.getLong("DefaultSettings.ConnectionTimeout", 30000)
-        config.idleTimeout = settingsFile.getLong("DefaultSettings.IdleTimeout", 600000)
-        config.maxLifetime = settingsFile.getLong("DefaultSettings.MaxLifetime", 1800000)
-        if (settingsFile.contains("DefaultSettings.ConnectionTestQuery")) {
-            config.connectionTestQuery = settingsFile.getString("DefaultSettings.ConnectionTestQuery")
-        }
-        if (settingsFile.contains("DefaultSettings.DataSourceProperty")) {
-            settingsFile.getConfigurationSection("DefaultSettings.DataSourceProperty")?.getKeys(false)?.forEach { key ->
-                config.addDataSourceProperty(key, settingsFile.getString("DefaultSettings.DataSourceProperty.$key"))
-            }
-        }
-        return config
+    companion object {
+
+        @JvmField
+        val INSTANCE: Database = SimpleServiceLoader.load(Database::class.java)
+
+        fun createDataSource(host: Host, hikariConfig: HikariConfig? = null) = INSTANCE.createDataSource(host, hikariConfig)
     }
 }

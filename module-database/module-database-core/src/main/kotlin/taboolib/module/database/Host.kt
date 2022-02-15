@@ -3,6 +3,9 @@ package taboolib.module.database
 import com.zaxxer.hikari.HikariDataSource
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.configuration.Configuration
+import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.sql.DataSource
 
@@ -10,28 +13,19 @@ import javax.sql.DataSource
  * @author sky
  * @since 2018-05-14 19:07
  */
-abstract class Host<T : ColumnBuilder> {
+abstract class Host {
 
-    abstract val columnBuilder: ColumnBuilder
+    abstract val url: String?
 
-    abstract val connectionUrl: String?
-
-    abstract val connectionUrlSimple: String?
-
-    fun createDataSource(autoRelease: Boolean = true): DataSource {
-        return Database.createDataSource(this).also {
-            if (autoRelease) {
-                dataSources += it as HikariDataSource
-            }
-        }
-    }
+    fun dataSource(): DataSource =
+        Database.createDataSource(this).apply { dataSources += this as HikariDataSource }
 
     companion object {
 
-        internal val dataSources = CopyOnWriteArrayList<HikariDataSource>()
+        private val dataSources = CopyOnWriteArrayList<HikariDataSource>()
 
         @Awake(LifeCycle.DISABLE)
-        internal fun release() {
+        private fun release() {
             dataSources.forEach { it.close() }
         }
     }
