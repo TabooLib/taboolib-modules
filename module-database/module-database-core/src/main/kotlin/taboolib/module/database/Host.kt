@@ -1,32 +1,44 @@
 package taboolib.module.database
 
-import com.zaxxer.hikari.HikariDataSource
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
+import taboolib.common.io.newFile
+import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.configuration.Configuration
 import java.io.File
-import java.util.concurrent.CopyOnWriteArrayList
-import javax.sql.DataSource
 
 /**
- * @author sky
- * @since 2018-05-14 19:07
+ * TabooLib
+ * taboolib.module.database.Host
+ *
+ * @author 坏黑
+ * @since 2022/2/16 3:35 PM
  */
-abstract class Host {
+@Suppress("UNCHECKED_CAST")
+abstract class Host<T>(private val clazz: Class<T>) {
 
-    abstract val url: String?
+    operator fun invoke(func: T.() -> Unit): T {
+        return (clazz.unsafeInstance() as T).apply(func)
+    }
 
-    fun dataSource(): DataSource =
-        Database.createDataSource(this).apply { dataSources += this as HikariDataSource }
+    object SQL : Host<Platform.SQL>(Platform.SQL::class.java) {
 
-    companion object {
+        operator fun invoke(host: String, port: Int, user: String, password: String, database: String, func: Platform.SQL.() -> Unit = {}): Platform.SQL =
+            Platform.SQL(host, port, user, password, database).apply(func)
 
-        private val dataSources = CopyOnWriteArrayList<HikariDataSource>()
-
-        @Awake(LifeCycle.DISABLE)
-        private fun release() {
-            dataSources.forEach { it.close() }
+        operator fun invoke(section: ConfigurationSection, func: Platform.SQL.() -> Unit = {}): Platform.SQL {
+            val host = section.getString("host", "localhost")!!
+            val user = section.getString("user", "root")!!
+            val password = section.getString("password", "root")!!
+            val database = section.getString("database", "test")!!
+            return invoke(host, section.getInt("port"), user, password, database).apply(func)
         }
+    }
+
+    object SQLite : Host<Platform.SQLite>(Platform.SQLite::class.java) {
+
+        operator fun invoke(file: File, name: String) = Platform.SQLite(newFile(file, name))
+
+        operator fun invoke(name: String) = Platform.SQLite(newFile(name))
+
+        operator fun invoke(file: File) = Platform.SQLite(file)
     }
 }

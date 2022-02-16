@@ -8,15 +8,19 @@ import javax.sql.DataSource
 @RuntimeDependency(value = "!com.zaxxer:HikariCP:4.0.3", test = "!hikari501.HikariDataSource", relocate = ["!com.zaxxer.hikari", "!hikari403"])
 abstract class Database {
 
-    abstract fun createDataSource(host: Host, hikariConfig: HikariConfig? = null): DataSource
+    abstract fun createConfig(host: DataSourceContainer): HikariConfig
 
-    abstract fun createHikariConfig(host: Host): HikariConfig
+    abstract fun createDataSource(host: DataSourceContainer, config: HikariConfig? = null): DataSource
 
     companion object {
 
         @JvmField
-        val INSTANCE: Database = SimpleServiceLoader.load(Database::class.java)
+        val SQL = Host.SQL
 
-        fun createDataSource(host: Host, hikariConfig: HikariConfig? = null) = INSTANCE.createDataSource(host, hikariConfig)
+        @JvmField
+        val SQLITE = Host.SQLite
+
+        @JvmField
+        val INSTANCE: Database = SimpleServiceLoader.load(Database::class.java)
     }
 }

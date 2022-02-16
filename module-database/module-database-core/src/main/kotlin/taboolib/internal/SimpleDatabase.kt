@@ -4,11 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.module.configuration.Configuration
-import taboolib.module.database.Database
-import taboolib.module.database.Host
-import taboolib.module.database.SQL
-import taboolib.module.database.SQLite
-import javax.sql.DataSource
+import taboolib.module.database.*
 
 /**
  * TabooLib
@@ -26,20 +22,16 @@ class SimpleDatabase : Database() {
         Configuration.loadFromInputStream(javaClass.classLoader.getResourceAsStream("datasource.yml")!!)
     }
 
-    override fun createDataSource(host: Host, hikariConfig: HikariConfig?): DataSource {
-        return HikariDataSource(hikariConfig ?: createHikariConfig(host))
-    }
-
-    override fun createHikariConfig(host: Host): HikariConfig {
+    override fun createConfig(host: DataSourceContainer): HikariConfig {
         val config = HikariConfig()
-        config.jdbcUrl = host.url
+        config.jdbcUrl = host.url()
         when (host) {
-            is SQL -> {
+            is PlatformSQL -> {
                 config.driverClassName = settingsFile.getString("DefaultSettings.DriverClassName", "com.mysql.jdbc.Driver")
                 config.username = host.user
                 config.password = host.password
             }
-            is SQLite -> {
+            is PlatformSQLite -> {
                 config.driverClassName = "org.sqlite.JDBC"
             }
             else -> {
@@ -63,4 +55,6 @@ class SimpleDatabase : Database() {
         }
         return config
     }
+
+    override fun createDataSource(host: DataSourceContainer, config: HikariConfig?) = HikariDataSource(config ?: createConfig(host))
 }

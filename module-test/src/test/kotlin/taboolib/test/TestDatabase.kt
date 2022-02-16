@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import taboolib.common.io.newFile
 import taboolib.common.io.runningClasses
+import taboolib.module.database.Database
 import taboolib.module.database.affairProxy
-import taboolib.module.database.SQLite
 import taboolib.test.database.TestAffairs
 import javax.sql.DataSource
 
@@ -23,7 +23,7 @@ class TestDatabase {
 
     @BeforeEach
     internal fun setUp() {
-        dataSource = SQLite(newFile("test.db")).dataSource()
+        dataSource = Database.SQLITE("test.db").dataSource()
         affairs = affairProxy(dataSource)
     }
 

@@ -1,7 +1,5 @@
 package taboolib.module.database
 
-import javax.sql.DataSource
-
 /**
  * TabooLib
  * taboolib.module.database.DataAffairs
