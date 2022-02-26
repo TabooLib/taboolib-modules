@@ -31,7 +31,7 @@ public class Metrics {
         // Get the config file
         File bStatsFolder = new File(IOKt.getDataFolder().getParentFile(), "bStats");
         File configFile = FileKt.newFile(bStatsFolder, "config.yml", true, false);
-        Configuration config = Configuration.Companion.loadFromFile(configFile, Type.YAML);
+        Configuration config = Configuration.Companion.loadFromFile(configFile, Type.YAML, true);
         if (!config.contains("serverUUID")) {
             config.set("enabled", true);
             config.set("serverUUID", UUID.randomUUID().toString());

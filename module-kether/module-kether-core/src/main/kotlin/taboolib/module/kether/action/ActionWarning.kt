@@ -1,7 +1,6 @@
 package taboolib.module.kether.action
 
 import taboolib.common.platform.function.warning
-import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.ScriptAction

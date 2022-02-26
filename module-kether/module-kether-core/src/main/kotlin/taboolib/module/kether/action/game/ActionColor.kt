@@ -1,6 +1,5 @@
 package taboolib.module.kether.action.game
 
-import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.chat.colored
 import taboolib.module.kether.KetherParser

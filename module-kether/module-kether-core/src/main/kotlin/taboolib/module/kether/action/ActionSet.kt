@@ -52,11 +52,11 @@ class ActionSet {
                     it.reset()
                     ActionProperty.Set(action.instance, action.key, ParsedAction(LiteralAction<String>(it.nextToken())))
                 }
-            } else {
+            } else if (token != "property") {
                 it.mark()
                 try {
-                    it.expect("property")
                     val property = it.nextToken()
+                    it.expect("from")
                     val source = it.nextParsedAction()
                     it.expect("to")
                     ActionProperty.Set(source, property, it.nextParsedAction())
@@ -70,6 +70,15 @@ class ActionSet {
                         it.reset()
                         ForConstant(token, it.nextToken())
                     }
+                }
+            } else {
+                it.mark()
+                try {
+                    it.expect("to")
+                    ForAction(token, it.nextParsedAction())
+                } catch (ex: Exception) {
+                    it.reset()
+                    ForConstant(token, it.nextToken())
                 }
             }
         }

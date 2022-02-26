@@ -249,13 +249,13 @@ enum class PlayerOperators(
 
     FOOD_LEVEL(
         { it.foodLevel },
-        { p, m, v -> p.foodLevel = p.foodLevel.modify(m, v) },
+        { p, m, v -> p.foodLevel = p.foodLevel.modify(m, v).coerceAtMost(20) },
         *PlayerOperator.Method.values()
     ),
 
     HEALTH(
         { it.health },
-        { p, m, v -> p.health = p.health.modify(m, v) },
+        { p, m, v -> p.health = p.health.modify(m, v, max = p.maxHealth) },
         *PlayerOperator.Method.values()
     ),
 

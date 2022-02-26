@@ -4,7 +4,9 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.module.configuration.Configuration
-import taboolib.module.database.*
+import taboolib.module.database.DataSourceContainer
+import taboolib.module.database.Database
+import taboolib.module.database.Platform
 
 /**
  * TabooLib
@@ -26,12 +28,12 @@ class SimpleDatabase : Database() {
         val config = HikariConfig()
         config.jdbcUrl = host.url()
         when (host) {
-            is PlatformSQL -> {
+            is Platform.SQL -> {
                 config.driverClassName = settingsFile.getString("DefaultSettings.DriverClassName", "com.mysql.jdbc.Driver")
                 config.username = host.user
                 config.password = host.password
             }
-            is PlatformSQLite -> {
+            is Platform.SQLite -> {
                 config.driverClassName = "org.sqlite.JDBC"
             }
             else -> {

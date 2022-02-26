@@ -2,7 +2,6 @@ package taboolib.module.kether.action.transform
 
 import org.apache.commons.lang3.time.DateFormatUtils
 import taboolib.common5.Coerce
-import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
@@ -10,10 +9,14 @@ import java.util.concurrent.CompletableFuture
 /**
  * @author IzzelAliz
  */
-class ActionFormat(val date: ParsedAction<*>, val format: String) : ScriptAction<String>() {
+class ActionFormat(val date: ParsedAction<*>, val format: ParsedAction<*>) : ScriptAction<String>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<String> {
-        return frame.newFrame(date).run<Any>().thenApply { DateFormatUtils.format(Coerce.toLong(it), format) }
+        return frame.newFrame(date).run<Any>().thenApply { date ->
+            frame.newFrame(format).run<Any>().thenApply { format ->
+                DateFormatUtils.format(Coerce.toLong(date), format.toString())
+            }.join()
+        }
     }
 
     internal object Parser {
@@ -27,10 +30,10 @@ class ActionFormat(val date: ParsedAction<*>, val format: String) : ScriptAction
                 it.nextParsedAction(), try {
                     it.mark()
                     it.expects("by", "with")
-                    it.nextToken()
+                    it.nextParsedAction()
                 } catch (ignored: Exception) {
                     it.reset()
-                    "yyyy/MM/dd HH:mm"
+                    literalAction("yyyy/MM/dd HH:mm")
                 }
             )
         }

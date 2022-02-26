@@ -1,10 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.tabooproject.shrinkingkt.ShrinkingExt
 
 plugins {
     `maven-publish`
-    id("org.jetbrains.kotlin.jvm") version "1.5.31" apply false
-    id("org.tabooproject.shrinkingkt") version "1.0.4" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.6.10" apply false
+    id("org.tabooproject.shrinkingkt") version "1.0.6" apply false
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 
@@ -47,6 +48,10 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll(listOf("-XDenableSunApiLintControl"))
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions.freeCompilerArgs += listOf("-module-name", "${project.group}.${project.name}")
     }
 
     publishing {

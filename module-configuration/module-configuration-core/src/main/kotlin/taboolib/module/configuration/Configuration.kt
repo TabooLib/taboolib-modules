@@ -1,10 +1,10 @@
 package taboolib.module.configuration
 
 import com.electronwill.nightconfig.core.conversion.ObjectConverter
-import taboolib.common.reflect.Reflex.Companion.invokeConstructor
-import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.common.env.RuntimeDependencies
 import taboolib.common.env.RuntimeDependency
+import taboolib.common.reflect.Reflex.Companion.invokeConstructor
+import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.internal.ConfigFile
 import taboolib.internal.ConfigSection
 import taboolib.library.configuration.ConfigurationSection
@@ -51,30 +51,36 @@ interface Configuration : ConfigurationSection {
 
     companion object {
 
-        fun empty(type: Type = Type.YAML): Configuration {
-            return ConfigFile(type.newFormat().createConfig())
+        fun empty(type: Type = Type.YAML, concurrent: Boolean = true): Configuration {
+            val config = if (concurrent) type.newFormat().createConcurrentConfig() else type.newFormat().createConfig()
+            return ConfigFile(config)
         }
 
-        fun loadFromFile(file: File, type: Type? = null): Configuration {
-            val configFile = ConfigFile((type ?: getTypeFromFile(file)).newFormat().createConfig())
+        fun loadFromFile(file: File, type: Type? = null, concurrent: Boolean = true): Configuration {
+            val fileType = type ?: getTypeFromFile(file)
+            val config = if (concurrent) fileType.newFormat().createConcurrentConfig() else fileType.newFormat().createConfig()
+            val configFile = ConfigFile(config)
             configFile.loadFromFile(file)
             return configFile
         }
 
-        fun loadFromReader(reader: Reader, type: Type = Type.YAML): Configuration {
-            val configFile = ConfigFile(type.newFormat().createConfig())
+        fun loadFromReader(reader: Reader, type: Type = Type.YAML, concurrent: Boolean = true): Configuration {
+            val config = if (concurrent) type.newFormat().createConcurrentConfig() else type.newFormat().createConfig()
+            val configFile = ConfigFile(config)
             configFile.loadFromReader(reader)
             return configFile
         }
 
-        fun loadFromString(contents: String, type: Type = Type.YAML): Configuration {
-            val configFile = ConfigFile(type.newFormat().createConfig())
+        fun loadFromString(contents: String, type: Type = Type.YAML, concurrent: Boolean = true): Configuration {
+            val config = if (concurrent) type.newFormat().createConcurrentConfig() else type.newFormat().createConfig()
+            val configFile = ConfigFile(config)
             configFile.loadFromString(contents)
             return configFile
         }
 
-        fun loadFromInputStream(inputStream: InputStream, type: Type = Type.YAML): Configuration {
-            val configFile = ConfigFile(type.newFormat().createConfig())
+        fun loadFromInputStream(inputStream: InputStream, type: Type = Type.YAML, concurrent: Boolean = true): Configuration {
+            val config = if (concurrent) type.newFormat().createConcurrentConfig() else type.newFormat().createConfig()
+            val configFile = ConfigFile(config)
             configFile.loadFromInputStream(inputStream)
             return configFile
         }

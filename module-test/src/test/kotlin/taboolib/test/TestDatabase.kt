@@ -2,7 +2,6 @@ package taboolib.test
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import taboolib.common.io.newFile
 import taboolib.common.io.runningClasses
 import taboolib.module.database.Database
 import taboolib.module.database.affairProxy

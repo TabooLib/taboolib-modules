@@ -3,7 +3,6 @@ package taboolib.internal
 import com.electronwill.nightconfig.core.CommentedConfig
 import com.electronwill.nightconfig.core.Config
 import com.electronwill.nightconfig.core.EnumGetMethod
-import jdk.jfr.Experimental
 import taboolib.common.reflect.Reflex.Companion.setProperty
 import taboolib.common.util.decodeUnicode
 import taboolib.common5.Coerce
